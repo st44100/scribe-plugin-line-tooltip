@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style type="text/css">
+    button.active {
+      border-style: inset;
+    }
+    p {
+      line-height: 24px;
+    }
+    .scribe {
+      padding: 10px;
+      margin: 30px;
+    }
+    .scribe {
+      position: relative;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Scribe Line tooltip example</h1>
+  <div class="scribe">
+    <p>
+      あのイーハトーヴォの<br/>
+      すきとおった風、<br/>
+    </p>
+    <p>
+      <br/>
+    </p>
+    <p>
+      夏でも底に冷たさをもつ青いそら、<br/>
+      うつくしい森で飾られたモリーオ市、<br/>
+      郊外のぎらぎらひかる草の波。
+    </p>
+  </div>
+
+  <script src="../bower_components/lodash/lodash.js"></script>
+  <script src="../bower_components/requirejs/require.js"></script>
+  <script>
+    require.config({
+      baseUrl: '../',
+      paths: {
+        'scribe': './bower_components/scribe/scribe'
+      }
+    });
+
+    require([], function() {
+      require(
+        [
+            'scribe',
+            'assets/scribe-plugin-line-tooltip'
+        ],
+        function(Scribe, scribeLineTooltip) {
+          var elem = window.document.querySelector('.scribe'),
+              scribe = window.scribe = new Scribe(elem);
+
+          scribe.use(scribeLineTooltip());
+
+        }
+      );
+    });
+  </script>
+</body>
+</html>
