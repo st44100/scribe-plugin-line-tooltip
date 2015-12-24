@@ -9,6 +9,9 @@
     p {
       line-height: 24px;
     }
+    .scribe-outer {
+      position: relative;
+    }
     .scribe {
       padding: 10px;
       margin: 30px;
@@ -21,19 +24,21 @@
 </head>
 <body>
   <h1>Scribe Line tooltip example</h1>
-  <div class="scribe">
-    <p>
-      あのイーハトーヴォの<br/>
-      すきとおった風、<br/>
-    </p>
-    <p>
-      <br/>
-    </p>
-    <p>
-      夏でも底に冷たさをもつ青いそら、<br/>
-      うつくしい森で飾られたモリーオ市、<br/>
-      郊外のぎらぎらひかる草の波。
-    </p>
+  <div class="scribe-outer">
+    <div class="scribe">
+      <p>
+        あのイーハトーヴォの<br/>
+        すきとおった風、<br/>
+      </p>
+      <p>
+        <br/>
+      </p>
+      <p>
+        夏でも底に冷たさをもつ青いそら、<br/>
+        うつくしい森で飾られたモリーオ市、<br/>
+        郊外のぎらぎらひかる草の波。
+      </p>
+    </div>
   </div>
 
   <script src="../bower_components/lodash/lodash.js"></script>
@@ -52,11 +57,42 @@
             'scribe',
             'assets/scribe-plugin-line-tooltip'
         ],
-        function(Scribe, scribeLineTooltip) {
+        function(Scribe, ScribeLineTooltip) {
           var elem = window.document.querySelector('.scribe'),
               scribe = window.scribe = new Scribe(elem);
 
-          scribe.use(scribeLineTooltip());
+          //tooltip = scribeLineTooltip.default
+          tooltip = new ScribeLineTooltip.default()
+          scribe.use(
+            tooltip.init(
+              elem.parentNode,
+              {
+                click: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('click')
+                },
+                hover: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('hover')
+                },
+                mouseenter: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('mouseenter')
+
+                  tooltip.currentTooltipEl.querySelector('.js-tooltip').classList.add('tooltip--hover')
+                },
+                mouseleave: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('mouseleave')
+                  tooltip.currentTooltipEl.querySelector('.js-tooltip').classList.remove('tooltip--hover')
+                }
+              }
+            )
+          );
 
         }
       );

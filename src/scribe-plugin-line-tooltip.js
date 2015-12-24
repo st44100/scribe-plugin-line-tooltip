@@ -10,94 +10,92 @@ let classNameBase = 'scribe-plugin-line-tooltip'
 
 require('./scribe-plugin-line-tooltip.styl');
 
-module.exports = function(placeholder, editorContainer) {
 
-  return function(scribe) {
+export default class TooltipPlugin {
+  constructor () {
+    this.currentTooltipEl = null
+    return this
+  }
 
+  init (editorContainer, handlers) {
+    this.parentBounce = editorContainer.getBoundingClientRect()
+    this.editorContainer = editorContainer
+    this.handlers = handlers
+    return (scribe) => {
+      scribe.el.addEventListener('click', _.throttle(this.update.bind(this), 300))
+      scribe.el.addEventListener('keyup', _.throttle(this.updateKey.bind(this), 300))
+    }
+  }
 
-    let currentTooltipEl = null
-    let parentBounce = scribe.el.getBoundingClientRect()
-
-    function getPosition () {
+  createTootip () {
+    if (this.currentTooltipEl !== null) {
+      return false;
     }
 
-    function onClickTootip () {
-      debugger
-    }
-    function onHoverTooltip () {
-      debugger
-    }
+    var tooltipOuter = document.createElement('div')
+    tooltipOuter.classList.add(`${classNameBase}`)
+    tooltipOuter.classList.add(`${classNameBase}--tooltip`)
 
-    function createTootip () {
-      if (currentTooltipEl !== null) {
-        return false;
-      }
+    var tooltipEl = document.createElement('div')
+    tooltipEl.classList.add(`tooltip`)
+    tooltipEl.classList.add(`js-tooltip`)
+    tooltipEl.innerHTML = `
+      <p> + </p>
+    `
+    tooltipOuter.appendChild(tooltipEl)
+    this.currentTooltipEl = tooltipOuter
 
-      var tooltipOuter = document.createElement('div')
-      tooltipOuter.classList.add(`${classNameBase}`)
-      tooltipOuter.classList.add(`${classNameBase}--tooltip`)
+    _.forEach(this.handlers, function(handler, key) {
+      tooltipEl.addEventListener(key, (e) => { handler(e, this) })
+    })
 
-      var tooltipEl = document.createElement('div')
-      tooltipEl.innerHTML = `
-        <p> + </p>
-      `
-      tooltipOuter.appendChild(tooltipEl)
-      currentTooltipEl = tooltipOuter
+    this.editorContainer.appendChild(tooltipOuter)
+    return true;
+  }
 
-      scribe.el.appendChild(tooltipOuter)
-      return true;
-    }
+  removeTooltip () {
+    let tooltips = this.editorContainer.querySelectorAll('.scribe-plugin-line-tooltip')
 
-    function removeTooltip () {
-      let tooltips = scribe.el.querySelectorAll('.scribe-plugin-line-tooltip')
+    _.forEach(tooltips, function(t) {
+      t.remove()
+    })
 
-      _.forEach(tooltips, function(t) {
-        t.remove()
-      })
+    this.currentTooltipEl = null
+    return true;
+  }
 
-      currentTooltipEl = null
-      return true;
-    }
+  update (e) {
+    var selection = new scribe.api.Selection();
+    console.log('UPDATE scribe', selection)
 
-    function update (e) {
-      var selection = new scribe.api.Selection();
-      console.log('UPDATE scribe', selection)
+    let lineElement = selection.getContaining(function (node) {
+      return node.nodeName === 'P';
+    });
 
-      let lineElement = selection.getContaining(function (node) {
-        return node.nodeName === 'P';
-      });
-
-      if (!lineElement) {
-        return
-      }
-
-      let nodeHelpers = scribe.node;
-
-      let isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
-
-      console.log('UPDATE is Empty line ? ', isEmptyLine)
-
-      if (isEmptyLine) {
-        lineElement.classList.add('emptyline');
-        removeTooltip()
-        createTootip()
-        let bounce = lineElement.getBoundingClientRect()
-        currentTooltipEl.style.top = bounce.top - parentBounce.top + 'px'
-      } else {
-        lineElement.classList.remove('emptyline');
-
-      }
+    if (!lineElement) {
+      return
     }
 
-    function updateKey (e) {
-      console.log('UPDATE is KeyUp line ? ')
-      update(e)
-    }
+    let nodeHelpers = scribe.node;
 
-    //scribe.on('content-changed', update);
-    //scribe.el.addEventListener('blur', _.throttle(update, 300));
-    //scribe.el.addEventListener('focus', _.throttle(update, 300));
-    scribe.el.addEventListener('click', _.throttle(update, 300))
-    scribe.el.addEventListener('keyup', _.throttle(updateKey, 300))
-  };
-};
+    let isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
+
+    console.log('UPDATE is Empty line ? ', isEmptyLine)
+
+    if (isEmptyLine) {
+      lineElement.classList.add('emptyline');
+      this.removeTooltip()
+      this.createTootip()
+      let bounce = lineElement.getBoundingClientRect()
+      this.currentTooltipEl.style.top = bounce.top - this.parentBounce.top + 'px'
+    } else {
+      lineElement.classList.remove('emptyline');
+    }
+  }
+
+  updateKey (e) {
+    console.log('UPDATE is KeyUp line ? ')
+    update(e)
+  }
+
+}
