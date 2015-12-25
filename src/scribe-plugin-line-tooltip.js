@@ -48,7 +48,7 @@ export default class ScribePluginLineTooltip {
    * @overirde
    * @return {HTMLElement} Tooltip element.
    */
-  createTootip () {
+  createTooltip () {
 
     var tooltipOuter = document.createElement('div')
     tooltipOuter.classList.add(`${classNameBase}`)
@@ -58,7 +58,7 @@ export default class ScribePluginLineTooltip {
     tooltipEl.classList.add(`tooltip`)
     tooltipEl.classList.add(`js-tooltip`)
     tooltipEl.innerHTML = `
-      <p> + </p>
+      <p class="tooltip__item"> + </p>
     `
     tooltipOuter.appendChild(tooltipEl)
 
@@ -75,7 +75,7 @@ export default class ScribePluginLineTooltip {
       return false;
     }
 
-    this.currentTooltipEl = this.createTootip()
+    this.currentTooltipEl = this.createTooltip()
 
     _.forEach(this.handlers, (handler, key) => {
       this.currentTooltipEl.addEventListener(key, (e) => { handler(e, this) })
