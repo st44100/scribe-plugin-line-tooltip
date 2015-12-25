@@ -4,7 +4,7 @@ Add Line tooltips to paragraph in [scribe](https://github.com/guardian/scribe/) 
 
 ## Installation
 
-- Install
+- WIP: Install
 
 ```
 npm install scribe-plugin-line-tooltip --save
