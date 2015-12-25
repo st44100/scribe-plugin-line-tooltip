@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style type="text/css">
+    button.active {
+      border-style: inset;
+    }
+    p {
+      line-height: 24px;
+    }
+    .scribe-outer {
+      position: relative;
+    }
+    .scribe {
+      padding: 10px;
+      margin: 30px;
+    }
+    .scribe {
+      position: relative;
+    }
+
+    .scribe-plugin-line-tooltip-menu-wrap {
+      position: absolute;
+    }
+    .scribe-plugin-line-tooltip-menu {
+      position: absolute;
+      display: block;
+      width: 200px;
+      top: -66px;
+      left: -43px;
+    }
+
+    .scribe-plugin-line-tooltip-menu--hidden {
+      display: none;
+    }
+
+    .scribe-plugin-line-tooltip-menu__item {
+      display: inline-block;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Scribe Line tooltip example</h1>
+  <div class="scribe-outer">
+    <div class="scribe">
+      <p>
+        あのイーハトーヴォの<br/>
+        すきとおった風、<br/>
+      </p>
+      <p>
+        <br/>
+      </p>
+      <p>
+        夏でも底に冷たさをもつ青いそら、<br/>
+        うつくしい森で飾られたモリーオ市、<br/>
+        郊外のぎらぎらひかる草の波。
+      </p>
+    </div>
+  </div>
+
+  <script src="../bower_components/lodash/lodash.js"></script>
+  <script src="../bower_components/requirejs/require.js"></script>
+  <script>
+    require.config({
+      baseUrl: '../',
+      paths: {
+        'scribe': './bower_components/scribe/scribe'
+      }
+    });
+
+    require([], function() {
+      require(
+        [
+            'scribe',
+            'assets/scribe-plugin-line-tooltip'
+        ],
+        function(Scribe, ScribeLineTooltip) {
+          var elem = window.document.querySelector('.scribe'),
+              scribe = window.scribe = new Scribe(elem);
+
+
+          var onClickMenu = function (e) {
+            e.preventDefault()
+            e.stopPropagation()
+
+            var action = e.target.getAttribute('data-command')
+            if (!action) {
+              return;
+            }
+            console.log('click')
+            scribe.el.focus();
+
+            switch(action) {
+              case 'insertImage':
+                scribe.insertHTML('<div data-block="image"><img src="https://pbs.twimg.com/media/CBk4KPQUEAAg9FI.png" /></div>')
+                break;
+              case 'insertHr':
+                scribe.insertHTML('<div data-block="divider">hr<hr/></div>')
+                break;
+              default:
+                // noop;
+                break;
+            }
+          }
+
+
+          // Extends Plugin.
+          ScribeLineTooltip.default.prototype.createTooltip = function() {
+            var classNameBase = 'scribe-plugin-line-tooltip'
+            var tooltipOuter = document.createElement('div')
+              tooltipOuter.classList.add(classNameBase)
+              tooltipOuter.classList.add(classNameBase + '--tooltip')
+
+              var tooltipEl = document.createElement('div')
+              tooltipEl.classList.add(`tooltip`)
+              tooltipEl.classList.add(`js-tooltip`)
+              tooltipEl.innerHTML = [
+                '<p class="tooltip__item"> + </p>',
+                '<div class="scribe-plugin-line-tooltip-menu-wrap">',
+                  '<ul class="scribe-plugin-line-tooltip-menu scribe-plugin-line-tooltip-menu--hidden js-scribe-plugin-line-tooltip-menu">',
+                    '<li class="scribe-plugin-line-tooltip-menu__item"><button data-command="insertImage">IMAGE</button></li>',
+                    '<li class="scribe-plugin-line-tooltip-menu__item"><button data-command="insertHr">HR</button></li>',
+                    '<li class="scribe-plugin-line-tooltip-menu__item"><button data-command="insertImage">IMAGE</button></li>',
+                  '</ul>',
+                '<div>'
+              ].join('')
+              tooltipOuter.appendChild(tooltipEl)
+
+              var buttons = tooltipEl.querySelectorAll('[data-command]')
+              var numOfButtons = buttons.length
+
+              for (var i = 0; i < numOfButtons; i++) {
+                buttons[i].addEventListener('mousedown', onClickMenu.bind(this))
+              }
+
+
+              return tooltipOuter
+          };
+
+          tooltip = new ScribeLineTooltip.default()
+          scribe.use(
+            tooltip.init(
+              elem.parentNode,
+              {
+                mousedown: function(e) {
+                  //e.preventDefault()
+                  //e.stopPropagation()
+                  //console.log('click')
+                  //scribe.el.focus();
+                  //scribe.insertHTML('<div data-block="divider">hr<hr/></div>')
+                },
+                hover: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('hover')
+                  var tooltipEl = tooltip.currentTooltipEl
+                },
+                mouseenter: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('mouseenter')
+
+                  tooltip.currentTooltipEl.querySelector('.js-tooltip').classList.add('tooltip--hover')
+                  tooltip.currentTooltipEl.querySelector('.js-scribe-plugin-line-tooltip-menu').classList.remove('scribe-plugin-line-tooltip-menu--hidden')
+                },
+                mouseleave: function(e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('mouseleave')
+                  tooltip.currentTooltipEl.querySelector('.js-tooltip').classList.remove('tooltip--hover')
+                  tooltip.currentTooltipEl.querySelector('.js-scribe-plugin-line-tooltip-menu').classList.add('scribe-plugin-line-tooltip-menu--hidden')
+                }
+              }
+            )
+          );
+
+        }
+      );
+    });
+  </script>
+</body>
+</html>
