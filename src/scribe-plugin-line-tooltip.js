@@ -8,15 +8,29 @@
 
 let classNameBase = 'scribe-plugin-line-tooltip'
 
+// Default style
 require('./scribe-plugin-line-tooltip.styl');
 
+/**
+ * @class  ScribePluginLineTooltip
+ */
+export default class ScribePluginLineTooltip {
 
-export default class TooltipPlugin {
   constructor () {
     this.currentTooltipEl = null
     return this
   }
 
+  /**
+   * Use this method to subscribe Sribe.
+   * @method
+   * @example
+   *
+   *    scribe.use(ScribePluginLine.init(parent, handlers));
+   * @param {HTMLElement} editorcontainer Outer element of scribe editor.
+   * @param {Object} handlers Tooltip event handlers.
+   * @param {Function} callback function for scribe.
+   */
   init (editorContainer, handlers) {
     this.parentBounce = editorContainer.getBoundingClientRect()
     this.editorContainer = editorContainer
@@ -27,10 +41,14 @@ export default class TooltipPlugin {
     }
   }
 
+
+  /**
+   * Craete tooltip Element.
+   * @method
+   * @overirde
+   * @return {HTMLElement} Tooltip element.
+   */
   createTootip () {
-    if (this.currentTooltipEl !== null) {
-      return false;
-    }
 
     var tooltipOuter = document.createElement('div')
     tooltipOuter.classList.add(`${classNameBase}`)
@@ -43,16 +61,35 @@ export default class TooltipPlugin {
       <p> + </p>
     `
     tooltipOuter.appendChild(tooltipEl)
-    this.currentTooltipEl = tooltipOuter
 
-    _.forEach(this.handlers, function(handler, key) {
-      tooltipEl.addEventListener(key, (e) => { handler(e, this) })
-    })
-
-    this.editorContainer.appendChild(tooltipOuter)
-    return true;
+    return tooltipOuter
   }
 
+
+  /**
+   * showTooltip
+   * @return {HTMLElement} Current active tooltip element.
+   */
+  setTooltip () {
+    if (this.currentTooltipEl !== null) {
+      return false;
+    }
+
+    this.currentTooltipEl = this.createTootip()
+
+    _.forEach(this.handlers, (handler, key) => {
+      this.currentTooltipEl.addEventListener(key, (e) => { handler(e, this) })
+    })
+
+    this.editorContainer.appendChild(this.currentTooltipEl)
+    return this.currentTooltipEl;
+  }
+
+
+  /**
+   * Remove all tooltip.
+   * @method
+   */
   removeTooltip () {
     let tooltips = this.editorContainer.querySelectorAll('.scribe-plugin-line-tooltip')
 
@@ -64,9 +101,13 @@ export default class TooltipPlugin {
     return true;
   }
 
+
+  /**
+   * Update handler for Scribe editor event.
+   * @param {Event} e Update event from Scribe Editor.
+   */
   update (e) {
     var selection = new scribe.api.Selection();
-    console.log('UPDATE scribe', selection)
 
     let lineElement = selection.getContaining(function (node) {
       return node.nodeName === 'P';
@@ -80,22 +121,25 @@ export default class TooltipPlugin {
 
     let isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
 
-    console.log('UPDATE is Empty line ? ', isEmptyLine)
 
     if (isEmptyLine) {
       lineElement.classList.add('emptyline');
       this.removeTooltip()
-      this.createTootip()
+      this.setTooltip()
       let bounce = lineElement.getBoundingClientRect()
       this.currentTooltipEl.style.top = bounce.top - this.parentBounce.top + 'px'
     } else {
       lineElement.classList.remove('emptyline');
+      this.removeTooltip()
     }
   }
 
+  /**
+   * Key update handler for Scribe editor event.
+   * @param {Event} e Update event from Scribe Editor.
+   */
   updateKey (e) {
-    console.log('UPDATE is KeyUp line ? ')
-    update(e)
+    this.update(e)
   }
 
 }

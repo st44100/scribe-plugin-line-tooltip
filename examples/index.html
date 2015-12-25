@@ -67,10 +67,12 @@
             tooltip.init(
               elem.parentNode,
               {
-                click: function(e) {
+                mousedown: function(e) {
                   e.preventDefault()
                   e.stopPropagation()
                   console.log('click')
+                  scribe.el.focus();
+                  scribe.insertHTML('<div data-block="divider">hr<hr/></div>')
                 },
                 hover: function(e) {
                   e.preventDefault()
