@@ -46,6 +46,14 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 	/**
 	 * Scribe Placeholder Plugin.
 	 * Plugin to display placeholder text inside the scribe editor.
@@ -56,56 +64,123 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 
 	var classNameBase = 'scribe-plugin-line-tooltip';
 
+	// Default style
 	__webpack_require__(1);
 
-	module.exports = function (placeholder, editorContainer) {
+	/**
+	 * @class  ScribePluginLineTooltip
+	 */
 
-	  return function (scribe) {
+	var ScribePluginLineTooltip = (function () {
+	  function ScribePluginLineTooltip() {
+	    _classCallCheck(this, ScribePluginLineTooltip);
 
-	    var currentTooltipEl = null;
-	    var parentBounce = scribe.el.getBoundingClientRect();
+	    this.currentTooltipEl = null;
+	    return this;
+	  }
 
-	    function getPosition() {}
+	  /**
+	   * Use this method to subscribe Sribe.
+	   * @method
+	   * @example
+	   *
+	   *    scribe.use(ScribePluginLine.init(parent, handlers));
+	   * @param {HTMLElement} editorcontainer Outer element of scribe editor.
+	   * @param {Object} handlers Tooltip event handlers.
+	   * @param {Function} callback function for scribe.
+	   */
 
-	    function onClickTootip() {
-	      debugger;
+	  _createClass(ScribePluginLineTooltip, [{
+	    key: 'init',
+	    value: function init(editorContainer, handlers) {
+	      var _this = this;
+
+	      this.parentBounce = editorContainer.getBoundingClientRect();
+	      this.editorContainer = editorContainer;
+	      this.handlers = handlers;
+	      return function (scribe) {
+	        scribe.el.addEventListener('click', _.throttle(_this.update.bind(_this), 300));
+	        scribe.el.addEventListener('keyup', _.throttle(_this.updateKey.bind(_this), 300));
+	      };
 	    }
-	    function onHoverTooltip() {
-	      debugger;
-	    }
 
-	    function createTootip() {
-	      if (currentTooltipEl !== null) {
-	        return false;
-	      }
+	    /**
+	     * Craete tooltip Element.
+	     * @method
+	     * @overirde
+	     * @return {HTMLElement} Tooltip element.
+	     */
+
+	  }, {
+	    key: 'createTooltip',
+	    value: function createTooltip() {
 
 	      var tooltipOuter = document.createElement('div');
 	      tooltipOuter.classList.add('' + classNameBase);
 	      tooltipOuter.classList.add(classNameBase + '--tooltip');
 
 	      var tooltipEl = document.createElement('div');
-	      tooltipEl.innerHTML = '\n        <p> + </p>\n      ';
+	      tooltipEl.classList.add('tooltip');
+	      tooltipEl.classList.add('js-tooltip');
+	      tooltipEl.innerHTML = '\n      <p class="tooltip__item"> + </p>\n    ';
 	      tooltipOuter.appendChild(tooltipEl);
-	      currentTooltipEl = tooltipOuter;
 
-	      scribe.el.appendChild(tooltipOuter);
-	      return true;
+	      return tooltipOuter;
 	    }
 
-	    function removeTooltip() {
-	      var tooltips = scribe.el.querySelectorAll('.scribe-plugin-line-tooltip');
+	    /**
+	     * showTooltip
+	     * @return {HTMLElement} Current active tooltip element.
+	     */
+
+	  }, {
+	    key: 'setTooltip',
+	    value: function setTooltip() {
+	      var _this2 = this;
+
+	      if (this.currentTooltipEl !== null) {
+	        return false;
+	      }
+
+	      this.currentTooltipEl = this.createTooltip();
+
+	      _.forEach(this.handlers, function (handler, key) {
+	        _this2.currentTooltipEl.addEventListener(key, function (e) {
+	          handler(e, _this2);
+	        });
+	      });
+
+	      this.editorContainer.appendChild(this.currentTooltipEl);
+	      return this.currentTooltipEl;
+	    }
+
+	    /**
+	     * Remove all tooltip.
+	     * @method
+	     */
+
+	  }, {
+	    key: 'removeTooltip',
+	    value: function removeTooltip() {
+	      var tooltips = this.editorContainer.querySelectorAll('.scribe-plugin-line-tooltip');
 
 	      _.forEach(tooltips, function (t) {
 	        t.remove();
 	      });
 
-	      currentTooltipEl = null;
+	      this.currentTooltipEl = null;
 	      return true;
 	    }
 
-	    function update(e) {
+	    /**
+	     * Update handler for Scribe editor event.
+	     * @param {Event} e Update event from Scribe Editor.
+	     */
+
+	  }, {
+	    key: 'update',
+	    value: function update(e) {
 	      var selection = new scribe.api.Selection();
-	      console.log('UPDATE scribe', selection);
 
 	      var lineElement = selection.getContaining(function (node) {
 	        return node.nodeName === 'P';
@@ -119,31 +194,34 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 
 	      var isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
 
-	      console.log('UPDATE is Empty line ? ', isEmptyLine);
-
 	      if (isEmptyLine) {
 	        lineElement.classList.add('emptyline');
-	        removeTooltip();
-	        createTootip();
+	        this.removeTooltip();
+	        this.setTooltip();
 	        var bounce = lineElement.getBoundingClientRect();
-	        currentTooltipEl.style.top = bounce.top - parentBounce.top + 'px';
+	        this.currentTooltipEl.style.top = bounce.top - this.parentBounce.top + 'px';
 	      } else {
 	        lineElement.classList.remove('emptyline');
+	        this.removeTooltip();
 	      }
 	    }
 
-	    function updateKey(e) {
-	      console.log('UPDATE is KeyUp line ? ');
-	      update(e);
-	    }
+	    /**
+	     * Key update handler for Scribe editor event.
+	     * @param {Event} e Update event from Scribe Editor.
+	     */
 
-	    //scribe.on('content-changed', update);
-	    //scribe.el.addEventListener('blur', _.throttle(update, 300));
-	    //scribe.el.addEventListener('focus', _.throttle(update, 300));
-	    scribe.el.addEventListener('click', _.throttle(update, 300));
-	    scribe.el.addEventListener('keyup', _.throttle(updateKey, 300));
-	  };
-	};
+	  }, {
+	    key: 'updateKey',
+	    value: function updateKey(e) {
+	      this.update(e);
+	    }
+	  }]);
+
+	  return ScribePluginLineTooltip;
+	})();
+
+	exports.default = ScribePluginLineTooltip;
 
 /***/ },
 /* 1 */
@@ -173,7 +251,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
-	exports.push([module.id, ".scribe-plugin-line-tooltip {\n  position: absolute;\n  color: #9e9e9e;\n  pointer-events: none;\n  position: absolute;\n  left: -15px;\n}\n.scribe-plugin-line-tooltip P {\n  line-height: 1;\n  margin: 5px 0;\n}\n", ""]);
+	exports.push([module.id, ".scribe-plugin-line-tooltip {\n  position: absolute;\n  cursor: pointer;\n}\n.scribe-plugin-line-tooltip p {\n  line-height: 1;\n  margin: 5px 0;\n  font-size: 20px;\n}\n.scribe-plugin-line-tooltip .tooltip--hover {\n  transition: all 0.1s ease-in;\n}\n.scribe-plugin-line-tooltip .tooltip--hover .tooltip__item {\n  transform: rotate(45deg);\n}\n", ""]);
 
 /***/ },
 /* 3 */
