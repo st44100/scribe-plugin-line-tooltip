@@ -76,6 +76,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, ScribePluginLineTooltip);
 
 	    this.currentTooltipEl = null;
+	    this.scribe = null;
 	    return this;
 	  }
 
@@ -99,6 +100,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	      this.editorContainer = editorContainer;
 	      this.handlers = handlers;
 	      return function (scribe) {
+	        _this.scribe = scribe;
 	        scribe.el.addEventListener('click', _.throttle(_this.update.bind(_this), 300));
 	        scribe.el.addEventListener('keyup', _.throttle(_this.updateKey.bind(_this), 300));
 	      };
@@ -180,7 +182,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'update',
 	    value: function update(e) {
-	      var selection = new scribe.api.Selection();
+	      var selection = new this.scribe.api.Selection();
 
 	      var lineElement = selection.getContaining(function (node) {
 	        return node.nodeName === 'P';
@@ -190,7 +192,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var nodeHelpers = scribe.node;
+	      var nodeHelpers = this.scribe.node;
 
 	      var isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
 

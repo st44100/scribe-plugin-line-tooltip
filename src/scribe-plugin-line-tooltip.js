@@ -18,6 +18,7 @@ export default class ScribePluginLineTooltip {
 
   constructor () {
     this.currentTooltipEl = null
+    this.scribe = null
     return this
   }
 
@@ -36,6 +37,7 @@ export default class ScribePluginLineTooltip {
     this.editorContainer = editorContainer
     this.handlers = handlers
     return (scribe) => {
+      this.scribe = scribe
       scribe.el.addEventListener('click', _.throttle(this.update.bind(this), 300))
       scribe.el.addEventListener('keyup', _.throttle(this.updateKey.bind(this), 300))
     }
@@ -107,7 +109,7 @@ export default class ScribePluginLineTooltip {
    * @param {Event} e Update event from Scribe Editor.
    */
   update (e) {
-    var selection = new scribe.api.Selection();
+    var selection = new this.scribe.api.Selection();
 
     let lineElement = selection.getContaining(function (node) {
       return node.nodeName === 'P';
@@ -117,7 +119,7 @@ export default class ScribePluginLineTooltip {
       return
     }
 
-    let nodeHelpers = scribe.node;
+    let nodeHelpers = this.scribe.node;
 
     let isEmptyLine = nodeHelpers.isEmptyInlineElement(lineElement);
 
