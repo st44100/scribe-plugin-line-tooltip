@@ -7,6 +7,9 @@ module.exports = {
     libraryTarget: "amd"
   },
   module: {
+    noParse: [
+      /[\/\\]node_modules[\/\\]angular[\/\\]angular\.js$/
+    ],
     loaders: [
       {
         test: /\.jsx?$/,

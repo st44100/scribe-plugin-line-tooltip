@@ -57,3 +57,26 @@ scribe.use(
   )
 );
 ```
+
+## Development
+
+### Task
+
+Using webpack to build.
+
+**Build**
+
+```zh
+$ npm run build
+```
+
+**Development**
+
+Using webpack dev server for development.
+
+```zh
+$ npm run dev
+$ open http://localhost:8080/webpack-dev-server/
+```
+
+
