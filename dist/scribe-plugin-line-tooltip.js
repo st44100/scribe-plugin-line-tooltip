@@ -201,7 +201,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	        this.removeTooltip();
 	        this.setTooltip();
 	        var bounce = lineElement.getBoundingClientRect();
-	        this.currentTooltipEl.style.top = bounce.top - this.parentBounce.top + 'px';
+	        this.currentTooltipEl.style.top = window.scrollY + bounce.top - this.parentBounce.top + 'px';
 	      } else {
 	        lineElement.classList.remove('emptyline');
 	        this.removeTooltip();

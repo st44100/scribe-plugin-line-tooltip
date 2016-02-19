@@ -129,7 +129,7 @@ export default class ScribePluginLineTooltip {
       this.removeTooltip()
       this.setTooltip()
       let bounce = lineElement.getBoundingClientRect()
-      this.currentTooltipEl.style.top = bounce.top - this.parentBounce.top + 'px'
+      this.currentTooltipEl.style.top = window.scrollY + bounce.top - this.parentBounce.top + 'px'
     } else {
       lineElement.classList.remove('emptyline');
       this.removeTooltip()
