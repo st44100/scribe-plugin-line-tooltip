@@ -131,8 +131,6 @@ export default class ScribePluginLineTooltip {
       this.setTooltip()
       let bounce = lineElement.getBoundingClientRect()
 
-      let tooltips = this.editorContainer.querySelectorAll('.scribe-plugin-line-tooltip')
-      let scrollContainer = this.scrollContainer
       let parentScrollTop = 0
 
       if (this.scrollContainer) {

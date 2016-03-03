@@ -96,8 +96,11 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	    value: function init(editorContainer, handlers) {
 	      var _this = this;
 
+	      var scrollContainer = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+
 	      this.parentBounce = editorContainer.getBoundingClientRect();
 	      this.editorContainer = editorContainer;
+	      this.scrollContainer = scrollContainer;
 	      this.handlers = handlers;
 	      return function (scribe) {
 	        _this.scribe = scribe;
@@ -201,7 +204,14 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	        this.removeTooltip();
 	        this.setTooltip();
 	        var bounce = lineElement.getBoundingClientRect();
-	        this.currentTooltipEl.style.top = window.scrollY + bounce.top - this.parentBounce.top + 'px';
+
+	        var parentScrollTop = 0;
+
+	        if (this.scrollContainer) {
+	          parentScrollTop = this.scrollContainer.scrollTop;
+	        }
+
+	        this.currentTooltipEl.style.top = window.scrollY + parentScrollTop + bounce.top - this.parentBounce.top + 'px';
 	      } else {
 	        lineElement.classList.remove('emptyline');
 	        this.removeTooltip();
