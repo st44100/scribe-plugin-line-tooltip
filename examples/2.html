@@ -12,6 +12,8 @@
     }
     .scribe-outer {
       position: relative;
+      height: 200px;
+      overflow: scroll;
     }
     .scribe {
       padding: 10px;
@@ -44,7 +46,7 @@
 </head>
 <body>
   <h1>Scribe Line tooltip example</h1>
-  <div class="scribe-outer">
+  <div class="scribe-outer scroll-container">
     <div class="scribe">
       <p>
         あのイーハトーヴォの<br/>
@@ -173,7 +175,8 @@
                   tooltip.currentTooltipEl.querySelector('.js-tooltip').classList.remove('tooltip--hover')
                   tooltip.currentTooltipEl.querySelector('.js-scribe-plugin-line-tooltip-menu').classList.add('scribe-plugin-line-tooltip-menu--hidden')
                 }
-              }
+              },
+              document.querySelector('.scroll-container')
             )
           );
 

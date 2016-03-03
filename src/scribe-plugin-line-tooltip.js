@@ -32,9 +32,10 @@ export default class ScribePluginLineTooltip {
    * @param {Object} handlers Tooltip event handlers.
    * @param {Function} callback function for scribe.
    */
-  init (editorContainer, handlers) {
+  init (editorContainer, handlers, scrollContainer = null) {
     this.parentBounce = editorContainer.getBoundingClientRect()
     this.editorContainer = editorContainer
+    this.scrollContainer = scrollContainer
     this.handlers = handlers
     return (scribe) => {
       this.scribe = scribe
@@ -129,7 +130,16 @@ export default class ScribePluginLineTooltip {
       this.removeTooltip()
       this.setTooltip()
       let bounce = lineElement.getBoundingClientRect()
-      this.currentTooltipEl.style.top = window.scrollY + bounce.top - this.parentBounce.top + 'px'
+
+      let tooltips = this.editorContainer.querySelectorAll('.scribe-plugin-line-tooltip')
+      let scrollContainer = this.scrollContainer
+      let parentScrollTop = 0
+
+      if (this.scrollContainer) {
+        parentScrollTop = this.scrollContainer.scrollTop
+      }
+
+      this.currentTooltipEl.style.top = window.scrollY + parentScrollTop + bounce.top - this.parentBounce.top + 'px'
     } else {
       lineElement.classList.remove('emptyline');
       this.removeTooltip()
