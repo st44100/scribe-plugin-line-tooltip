@@ -61,7 +61,7 @@ export default class ScribePluginLineTooltip {
     tooltipEl.classList.add(`tooltip`)
     tooltipEl.classList.add(`js-tooltip`)
     tooltipEl.innerHTML = `
-      <p class="tooltip__item"> <i class="icon icon--plus"></i> </p>
+      <p class="tooltip__item"> + </p>
     `
     tooltipOuter.appendChild(tooltipEl)
 
