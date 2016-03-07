@@ -127,7 +127,7 @@ define(function() { return /******/ (function(modules) { // webpackBootstrap
 	      var tooltipEl = document.createElement('div');
 	      tooltipEl.classList.add('tooltip');
 	      tooltipEl.classList.add('js-tooltip');
-	      tooltipEl.innerHTML = '\n      <p class="tooltip__item"> + </p>\n    ';
+	      tooltipEl.innerHTML = '\n      <p class="tooltip__item"> <i class="icon icon--plus"></i> </p>\n    ';
 	      tooltipOuter.appendChild(tooltipEl);
 
 	      return tooltipOuter;
